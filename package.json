@@ -1,6 +1,6 @@
 {
   "name": "obsidian-daily-activity",
-  "version": "0.9.7",
+  "version": "0.0.2",
   "description": "This is a plugin for Obsidian (https://obsidian.md). It inserts a list of links to files created or modified today to the file open in the editor.",
   "main": "build/main.js",
   "scripts": {
