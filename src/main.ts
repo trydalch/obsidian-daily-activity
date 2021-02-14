@@ -13,10 +13,15 @@ interface DailyActivityPluginSettings {
 	// Include current note?
 	// Include header? 
 	// Custom header values
+	// template for inserting?
+	// plain text or link?
 }
 
+// TODO: 
+// Track activity using events (file created, file modified, file opened, track additions/deletions by capturing file length on open/close (or focus/lose focus))
+
 const DEFAULT_SETTINGS: DailyActivityPluginSettings = {
-	mySetting: 'default'
+	
 }
 
 export default class DailyActivityPlugin extends Plugin {
@@ -75,8 +80,6 @@ export default class DailyActivityPlugin extends Plugin {
 				}
 			]
 		})
-
-		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
 
 	onunload() {
@@ -89,50 +92,5 @@ export default class DailyActivityPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		let {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: DailyActivityPlugin;
-
-	constructor(app: App, plugin: DailyActivityPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		let {containerEl} = this;
-
-		containerEl.empty();
-
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		// new Setting(containerEl)
-		// 	.setName('Setting #1')
-		// 	.setDesc('It\'s a secret')
-		// 	.addText(text => text
-		// 		.setPlaceholder('Enter your secret')
-		// 		.setValue('')
-		// 		.onChange(async (value) => {
-		// 			console.log('Secret: ' + value);
-		// 			this.plugin.settings.mySetting = value;
-		// 			await this.plugin.saveSettings();
-		// 		}));
 	}
 }

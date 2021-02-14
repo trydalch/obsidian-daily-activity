@@ -1,11 +1,11 @@
 import DailyActivityPlugin from "src/main";
-import moment from "moment";
-import { App, MarkdownView, Plugin } from "obsidian";
+import { App, getLinkpath, MarkdownView, Plugin } from "obsidian";
 
 export class ActivityLogger {
 
     app: App
     plugin: Plugin
+    moment: any
 
 
     constructor(app: App, plugin: DailyActivityPlugin) {
@@ -13,14 +13,12 @@ export class ActivityLogger {
         this.plugin = plugin
     }
 
-
-
     private getLinksToFilesModifiedToday() {
         let files = this.app.vault.getFiles()
         let links: string[] = [];
         files.forEach(f => {
-            if (moment().isSame(new Date(f.stat.mtime), 'day')) {
-                links.push(`[[${f.basename}]]`);
+            if (this.moment.isSame(new Date(f.stat.mtime), 'day')) {
+                links.push(`[[${getLinkpath(f.path)}]]`);
             }
         });
 
@@ -31,8 +29,8 @@ export class ActivityLogger {
         let files = this.app.vault.getFiles()
         let links: string[] = [];
         files.forEach(f => {
-            if (moment().isSame(new Date(f.stat.ctime), 'day')) {
-                links.push(`[[${f.basename}]]`);
+            if (this.moment.isSame(new Date(f.stat.ctime), 'day')) {
+                links.push(`[[${getLinkpath(f.path)}]]`);
             }
         });
 
@@ -48,7 +46,12 @@ ${links.join('\n')}
     }
 
     async insertActivityLog({insertCreatedToday = false, insertModifiedToday = false}) {
+        this.moment = window.moment();
+
         let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
+        if (activeView == null) {
+            return;
+        }
         let editor = activeView.sourceMode.cmEditor;
         let doc = editor.getDoc();
 
