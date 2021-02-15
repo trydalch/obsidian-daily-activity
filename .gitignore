@@ -4,6 +4,6 @@ package-lock.json
 npm-debug.log
 
 # build
-build/main.js
+build/
 **/*.js.map
 debug.log
