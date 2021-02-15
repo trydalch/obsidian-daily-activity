@@ -1,10 +1,10 @@
 {
-	"id": "daily-activity",
-	"name": "Daily Activity",
-	"version": "0.0.2",
-	"minAppVersion": "0.9.12",
-	"description": "This outputs a list of the files changed/created today in the active file",
-	"author": "Trevor Rydalch",
-	"authorUrl": "https://github.com/trydalch",
-	"isDesktopOnly": false
+  "id": "daily-activity",
+  "name": "Obsidian Activity",
+  "version": "0.0.3",
+  "minAppVersion": "0.9.12",
+  "description": "A collection of commands to track your writing activity.",
+  "author": "Trevor Rydalch",
+  "authorUrl": "https://github.com/trydalch",
+  "isDesktopOnly": false
 }

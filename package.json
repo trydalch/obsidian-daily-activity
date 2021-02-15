@@ -1,11 +1,14 @@
 {
   "name": "obsidian-daily-activity",
-  "version": "0.0.2",
-  "description": "This is a plugin for Obsidian (https://obsidian.md). It inserts a list of links to files created or modified today to the file open in the editor.",
+  "version": "0.0.3",
+  "description": "This is a plugin for Obsidian (https://obsidian.md).",
   "main": "build/main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
-    "build": "rollup --config rollup.config.js"
+    "cp": "cp manifest.json ./build",
+    "build": "npm run cp && rollup --config rollup.config.js",
+    "devdeploy": "cp -r ./build/* $OBSPLUGINDIR/dev-daily-activity",
+    "bd": "npm run build && npm run devdeploy"
   },
   "keywords": [],
   "author": "",
