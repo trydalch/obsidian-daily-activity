@@ -1,38 +1,40 @@
-import DailyActivityPlugin from 'src/main';
-import { App, getLinkpath, MarkdownView, Plugin } from 'obsidian';
-import { Moment } from 'moment';
+/** @format */
+
+import DailyActivityPlugin from 'src/main'
+import { App, getLinkpath, MarkdownView, Plugin } from 'obsidian'
+import { Moment } from 'moment'
 
 export class ActivityLogger {
-  app: App;
-  plugin: Plugin;
+  app: App
+  plugin: Plugin
 
   constructor(app: App, plugin: DailyActivityPlugin) {
-    this.app = app;
-    this.plugin = plugin;
+    this.app = app
+    this.plugin = plugin
   }
 
   private getLinksToFilesModifiedOnDate(moment: Moment) {
-    let files = this.app.vault.getFiles();
-    let links: string[] = [];
+    let files = this.app.vault.getFiles()
+    let links: string[] = []
     files.forEach((f) => {
       if (moment.isSame(new Date(f.stat.mtime), 'day')) {
-        links.push(`[[${getLinkpath(f.path)}]]`);
+        links.push(`[[${getLinkpath(f.path)}]]`)
       }
-    });
+    })
 
-    return links;
+    return links
   }
 
   private getLinksToFilesCreatedOnDate(moment: Moment) {
-    let files = this.app.vault.getFiles();
-    let links: string[] = [];
+    let files = this.app.vault.getFiles()
+    let links: string[] = []
     files.forEach((f) => {
       if (moment.isSame(new Date(f.stat.ctime), 'day')) {
-        links.push(`[[${getLinkpath(f.path)}]]`);
+        links.push(`[[${getLinkpath(f.path)}]]`)
       }
-    });
+    })
 
-    return links;
+    return links
   }
 
   appendLinksToContent(existingContent: string, links: string[], header: string) {
@@ -43,7 +45,7 @@ export class ActivityLogger {
 ## ${header} Today: 
 ${links.join('\n')}
 `
-    );
+    )
   }
 
   async insertActivityLog({
@@ -52,79 +54,92 @@ ${links.join('\n')}
     moment = window.moment(),
     activeView = null,
   }: {
-    insertCreatedToday?: boolean;
-    insertModifiedToday?: boolean;
-    moment?: any;
-    activeView?: MarkdownView;
+    insertCreatedToday?: boolean
+    insertModifiedToday?: boolean
+    moment?: Moment
+    activeView?: MarkdownView
   }) {
     if (activeView == null) {
-      return;
+      return
     }
-    let editor = activeView.sourceMode.cmEditor;
-    let doc = editor.getDoc();
+    let editor = activeView.sourceMode.cmEditor
+    let doc = editor.getDoc()
 
-    let content = await this.app.vault.read(activeView.file);
-    let createdTodayLinks: string[] = [];
+    let content = await this.app.vault.read(activeView.file)
+    let createdTodayLinks: string[] = []
     if (insertCreatedToday) {
-      createdTodayLinks = this.getLinksToFilesCreatedOnDate(moment);
-      content = this.appendLinksToContent(content, createdTodayLinks, 'Created');
+      createdTodayLinks = this.getLinksToFilesCreatedOnDate(moment)
+      content = this.appendLinksToContent(content, createdTodayLinks, 'Created')
     }
     if (insertModifiedToday) {
       let modifiedTodayLinks: string[] = this.getLinksToFilesModifiedOnDate(moment).filter(
         (link) => createdTodayLinks.indexOf(link) === -1
-      );
-      content = this.appendLinksToContent(content, modifiedTodayLinks, 'Modified');
+      )
+      content = this.appendLinksToContent(content, modifiedTodayLinks, 'Modified')
     }
 
-    await this.app.vault.modify(activeView.file, content);
+    await this.app.vault.modify(activeView.file, content)
   }
 
-  async insertFileStats({
-    stats = ['created', 'modified'],
-    moment = window.moment(),
-    activeView = null,
-    allTime = false
-  }: {
-    stats?: string[];
-    moment?: any;
-    activeView?: MarkdownView;
-    allTime?: boolean
-  }) {
-    if (activeView == null) {
-      return;
-    }
+  generateFileStatRow(moment: Moment, stats: string[]): string {
+    let row = `|${moment.format('YYYY-MM-DD')}|`
+    stats.forEach((stat) => {
+      let statValue
+      if (stat == 'created') {
+        statValue = this.getLinksToFilesCreatedOnDate(moment).length
+      }
+      if (stat == 'modified') {
+        statValue = this.getLinksToFilesModifiedOnDate(moment).length
+      }
 
-    let content = await this.app.vault.read(activeView.file);
+      row = row + `${statValue}|`
+    })
 
-    let header =
+    return row
+  }
+
+  generateFileStatHeader(stats: string[]): string {
+    return (
       `| Date |` +
       stats.join(' | ') +
       `|
-|-------|${stats.map((s) => '----------').join('|')}|`;
-    let table = header;
-    let row = `|${window.moment(moment).format('YYYY-MM-DD')}|`;
-    stats.forEach((stat) => {
-      let statValue;
-      if (stat == 'created') {
-        statValue = this.getLinksToFilesCreatedOnDate(moment).length;
-      }
-      if (stat == 'modified') {
-        statValue = this.getLinksToFilesModifiedOnDate(moment).length;
-      }
+|-------|${stats.map((s) => '----------').join('|')}|`
+    )
+  }
+  async insertFileStats({
+    stats = ['created', 'modified'],
+    moments = [window.moment()],
+    activeView = null,
+    allTime = false,
+  }: {
+    stats?: string[]
+    moments?: Moment[]
+    activeView?: MarkdownView
+    allTime?: boolean
+  }) {
+    if (activeView == null) {
+      return
+    }
 
-      row = row + `${statValue}|`;
-    });
+    let content = await this.app.vault.read(activeView.file)
 
-    table =
-      table +
-      `
-${row}`;
+    let header = this.generateFileStatHeader(stats)
+    console.log(header)
+
+    let rows: string[] = []
+    moments.forEach((moment) => {
+      console.log('Moment: ' + moment)
+
+      rows.push(this.generateFileStatRow(moment, stats))
+    })
+    let table = header + `${'\n' + rows.join('\n')}`
 
     let newContent =
       content +
       `
 
-${table}`;
-    await this.app.vault.modify(activeView.file, newContent);
+${table}
+`
+    await this.app.vault.modify(activeView.file, newContent)
   }
 }
