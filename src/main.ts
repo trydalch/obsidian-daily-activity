@@ -1,5 +1,8 @@
-import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile } from 'obsidian';
-import { ActivityLogger } from 'src/ActivityLogger';
+/** @format */
+
+import { Moment } from 'moment'
+import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile } from 'obsidian'
+import { ActivityLogger } from 'src/ActivityLogger'
 
 interface DailyActivityPluginSettings {
   // TODO:
@@ -20,33 +23,33 @@ interface DailyActivityPluginSettings {
 // TODO:
 // Track activity using events (file created, file modified, file opened, track additions/deletions by capturing file length on open/close (or focus/lose focus))
 
-const DEFAULT_SETTINGS: DailyActivityPluginSettings = {};
+const DEFAULT_SETTINGS: DailyActivityPluginSettings = {}
 
 export default class DailyActivityPlugin extends Plugin {
-  settings: DailyActivityPluginSettings;
-  activityLogger: ActivityLogger;
+  settings: DailyActivityPluginSettings
+  activityLogger: ActivityLogger
 
   async onload() {
-    console.log('loading plugin');
+    console.log('loading plugin')
 
     // await this.loadSettings();
 
-    this.activityLogger = new ActivityLogger(this.app, this);
+    this.activityLogger = new ActivityLogger(this.app, this)
 
     this.addCommand({
       id: 'files-created-today',
       name: 'Links to Files Created Today',
       checkCallback: (checking: boolean) => {
-        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (activeView == null) {
-          return false;
+          return false
         }
 
         if (checking) {
-          return true;
+          return true
         }
 
-        this.activityLogger.insertActivityLog({ insertCreatedToday: true, activeView });
+        this.activityLogger.insertActivityLog({ insertCreatedToday: true, activeView })
       },
       hotkeys: [
         {
@@ -54,22 +57,22 @@ export default class DailyActivityPlugin extends Plugin {
           key: 'c',
         },
       ],
-    });
+    })
 
     this.addCommand({
       id: 'files-modified-today',
       name: 'Links to Files Modified Today',
       checkCallback: (checking: boolean) => {
-        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (activeView == null) {
-          return false;
+          return false
         }
 
         if (checking) {
-          return true;
+          return true
         }
 
-        this.activityLogger.insertActivityLog({ insertModifiedToday: true, activeView });
+        this.activityLogger.insertActivityLog({ insertModifiedToday: true, activeView })
       },
       hotkeys: [
         {
@@ -77,35 +80,92 @@ export default class DailyActivityPlugin extends Plugin {
           key: 'm',
         },
       ],
-    });
+    })
 
     this.addCommand({
       id: 'file-stats-today',
-      name: "Today's Stats",
+      name: "(Deprecated) Today's Stats",
       checkCallback: (checking: boolean) => {
-        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (activeView == null) {
-          return false;
+          return false
         }
 
         if (checking) {
-          return true;
+          return true
         }
 
-        this.activityLogger.insertFileStats({ activeView });
+        this.activityLogger.insertFileStats({ activeView })
       },
-    });
+    })
+
+    this.addCommand({
+      id: 'obsidian-stats',
+      name: "Stats for date (default's for today)",
+      checkCallback: (checking: boolean) => {
+        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
+        if (activeView == null) {
+          return false
+        }
+
+        if (checking) {
+          return true
+        }
+
+        let moments = this.getDates(activeView)
+        console.log(`${moments}`)
+
+        this.activityLogger.insertFileStats({ activeView, moments })
+      },
+    })
   }
 
   onunload() {
-    console.log('unloading plugin');
+    console.log('unloading plugin')
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
   }
 
   async saveSettings() {
-    await this.saveData(this.settings);
+    await this.saveData(this.settings)
+  }
+
+  getDates(activeView: MarkdownView): Moment[] {
+    let editor = activeView.sourceMode.cmEditor
+
+    if (!editor || !editor.somethingSelected()) {
+      // Return today for start & end
+      return [window.moment()]
+    }
+
+    let selection = editor.getSelection()
+
+    let moments: Moment[] = []
+    if (selection.contains('to')) {
+      const [start, end] = selection.split('to').map((s) => window.moment(s.trim()))
+      console.log('Start: ' + start)
+      console.log('End: ' + end)
+
+      let next = start
+      do {
+        console.log('Next: ' + next)
+        moments.push(window.moment(next))
+        next.add(1, 'd')
+      } while (next.isBefore(end))
+    } else {
+      switch (selection) {
+        case 'yesterday':
+          moments.push(window.moment().subtract(1, 'd'))
+          break
+        case 'today':
+        default:
+          moments.push(window.moment(selection))
+          break
+      }
+    }
+
+    return moments
   }
 }

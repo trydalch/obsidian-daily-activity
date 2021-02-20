@@ -1,4 +1,4 @@
-# Daily Activity Plugin
+# Obsidian Activity Plugin
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/trydalch/obsidian-daily-activity?style=for-the-badge&sort=semver)](https://github.com/trydalch/obsidian-daily-activity/releases/latest)
 ![GitHub All Releases](https://img.shields.io/github/downloads/trydalch/obsidian-daily-activity/total?style=for-the-badge)
@@ -11,14 +11,24 @@ Please open an issue for any bugs, feature requests, or feedback at https://gith
 
 ## Commands
 
-| Command                       | Description                                                    |
-| ----------------------------- | -------------------------------------------------------------- |
-| Links to Files Created Today  | Inserts a list of links to files created today                 |
-| Links to Files Modified Today | Inserts a list of links to files modified today                |
-| Today's Stats                 | Inserts a table containing stats from today's writing activity |
+| Command                       | Description                                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Links to Files Created Today  | Inserts a list of links to files created today                                                                       |
+| Links to Files Modified Today | Inserts a list of links to files modified today                                                                      |
+| Stats for date                | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. See below for an example. |
+| (Deprecated) Today's Stats    | Inserts a table containing stats from today's writing activity. <br> **Will be removed in future version**           |
+
+## Examples
+- **Stats for date**
+  - No selection: Outputs stats for today
+  - `yesterday`: Stats for yesterday
+  - `2021-02-20`: Stats for 2021-02-20
+  - `2021-02-15 to 2021-02-20`: Stats between those dates, inclusive range.
 
 ## Roadmap
 
 - [x] Add Activity Stats Command (# files created, # modified)
+- [x] Add option to insert stats for dates
+- [x] Add stats for date range
 - [ ] Add templating
 - [ ] Add filtering stats by tag
