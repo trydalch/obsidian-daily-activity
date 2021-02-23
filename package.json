@@ -1,15 +1,16 @@
 {
   "name": "obsidian-daily-activity",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "This is a plugin for Obsidian (https://obsidian.md).",
   "main": "build/main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
     "cpd": "cp dev-manifest.json ./build/manifest.json",
     "cp": "cp manifest.json ./build",
-    "build": "npm run cp && rollup --config rollup.config.js",
-    "devdeploy": "cp -r ./build/* $OBSPLUGINDIR/dev-daily-activity",
-    "bd": "npm run build  && npm run cpd && npm run devdeploy"
+    "build": "rollup --config rollup.config.js",
+    "dev-build": "npm run cp && rollup --config rollup.config.js",
+    "dev-deploy": "cp -r ./build/* $OBSPLUGINDIR/dev-daily-activity",
+    "bd": "npm run dev-build  && npm run cpd && npm run dev-deploy"
   },
   "keywords": [],
   "author": "",
