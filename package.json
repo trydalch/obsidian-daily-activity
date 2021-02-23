@@ -5,7 +5,7 @@
   "main": "build/main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
-    "cpd": "cp dev-manifest.json ./build/manifest.json",
+    "cpd": "cp ./build/dev-manifest.json ./build/manifest.json",
     "cp": "cp manifest.json ./build",
     "build": "rollup --config rollup.config.js",
     "dev-build": "npm run cp && rollup --config rollup.config.js",

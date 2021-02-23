@@ -15,7 +15,7 @@ Please open an issue for any bugs, feature requests, or feedback at https://gith
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Links to Files Created Today  | Inserts a list of links to files created today                                                                       |
 | Links to Files Modified Today | Inserts a list of links to files modified today                                                                      |
-| Stats for date                | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. See below for an example. |
+| Stats for date                | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. Supports natural language dates See below for an example. |
 | (Deprecated) Today's Stats    | Inserts a table containing stats from today's writing activity. <br> **Will be removed in future version**           |
 
 ## Examples
@@ -24,11 +24,15 @@ Please open an issue for any bugs, feature requests, or feedback at https://gith
   - `yesterday`: Stats for yesterday
   - `2021-02-20`: Stats for 2021-02-20
   - `2021-02-15 to 2021-02-20`: Stats between those dates, inclusive range.
+  - `5 days ago to today`: Stats for that range
+
+  For more examples of natural language date formats, see here: https://github.com/wanasit/chrono
 
 ## Roadmap
 
 - [x] Add Activity Stats Command (# files created, # modified)
 - [x] Add option to insert stats for dates
 - [x] Add stats for date range
+- [x] Add support for natural language dates
 - [ ] Add templating
 - [ ] Add filtering stats by tag
