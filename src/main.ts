@@ -1,8 +1,9 @@
 /** @format */
 
 import { Moment } from 'moment'
-import { App, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TAbstractFile } from 'obsidian'
+import { MarkdownView, Plugin } from 'obsidian'
 import { ActivityLogger } from 'src/ActivityLogger'
+import DateParser from 'src/DateParser'
 
 interface DailyActivityPluginSettings {
   // TODO:
@@ -134,6 +135,7 @@ export default class DailyActivityPlugin extends Plugin {
 
   getDates(activeView: MarkdownView): Moment[] {
     let editor = activeView.sourceMode.cmEditor
+    const dp = new DateParser()
 
     if (!editor || !editor.somethingSelected()) {
       // Return today for start & end
@@ -141,29 +143,13 @@ export default class DailyActivityPlugin extends Plugin {
     }
 
     let selection = editor.getSelection()
+    console.log(selection.contains('to'))
 
     let moments: Moment[] = []
     if (selection.contains('to')) {
-      const [start, end] = selection.split('to').map((s) => window.moment(s.trim()))
-      console.log('Start: ' + start)
-      console.log('End: ' + end)
-
-      let next = start
-      do {
-        console.log('Next: ' + next)
-        moments.push(window.moment(next))
-        next.add(1, 'd')
-      } while (next.isBefore(end))
+      moments = dp.parseDateRangeFromSelection(selection)
     } else {
-      switch (selection) {
-        case 'yesterday':
-          moments.push(window.moment().subtract(1, 'd'))
-          break
-        case 'today':
-        default:
-          moments.push(window.moment(selection))
-          break
-      }
+      moments.push(window.moment(dp.parseDate(selection)))
     }
 
     return moments

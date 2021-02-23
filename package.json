@@ -5,10 +5,11 @@
   "main": "build/main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
+    "cpd": "cp dev-manifest.json ./build/manifest.json",
     "cp": "cp manifest.json ./build",
     "build": "npm run cp && rollup --config rollup.config.js",
     "devdeploy": "cp -r ./build/* $OBSPLUGINDIR/dev-daily-activity",
-    "bd": "npm run build && npm run devdeploy"
+    "bd": "npm run build  && npm run cpd && npm run devdeploy"
   },
   "keywords": [],
   "author": "",
@@ -24,5 +25,7 @@
     "tslib": "^2.0.3",
     "typescript": "^4.0.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "chrono-node": "^2.2.1"
+  }
 }
