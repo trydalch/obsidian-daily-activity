@@ -5,7 +5,7 @@ on:
     tags:
       - '*'
 
-name: Create Release $${{ github.ref }}
+name: Create Release ${{ github.ref }}
 
 jobs:
   build:
