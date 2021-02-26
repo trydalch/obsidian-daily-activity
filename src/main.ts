@@ -38,7 +38,7 @@ export default class DailyActivityPlugin extends Plugin {
     this.activityLogger = new ActivityLogger(this.app, this)
 
     this.addCommand({
-      id: 'files-created-today',
+      id: 'links-to-files-created-today',
       name: 'Links to Files Created Today',
       checkCallback: (checking: boolean) => {
         let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
@@ -61,7 +61,7 @@ export default class DailyActivityPlugin extends Plugin {
     })
 
     this.addCommand({
-      id: 'files-modified-today',
+      id: 'links-to-files-modified-today',
       name: 'Links to Files Modified Today',
       checkCallback: (checking: boolean) => {
         let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
@@ -74,6 +74,52 @@ export default class DailyActivityPlugin extends Plugin {
         }
 
         this.activityLogger.insertActivityLog({ insertModifiedToday: true, activeView })
+      },
+      hotkeys: [
+        {
+          modifiers: ['Alt'],
+          key: 'm',
+        },
+      ],
+    })
+
+    this.addCommand({
+      id: 'files-created-today',
+      name: 'Plain Text List of Files Created Today',
+      checkCallback: (checking: boolean) => {
+        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
+        if (activeView == null) {
+          return false
+        }
+
+        if (checking) {
+          return true
+        }
+
+        this.activityLogger.insertActivityLog({ insertCreatedToday: true, activeView, makeLink: false })
+      },
+      hotkeys: [
+        {
+          modifiers: ['Alt'],
+          key: 'c',
+        },
+      ],
+    })
+
+    this.addCommand({
+      id: 'links-to-files-modified-today',
+      name: 'Plain Text List of Files Modified Today',
+      checkCallback: (checking: boolean) => {
+        let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
+        if (activeView == null) {
+          return false
+        }
+
+        if (checking) {
+          return true
+        }
+
+        this.activityLogger.insertActivityLog({ insertModifiedToday: true, activeView, makeLink: false })
       },
       hotkeys: [
         {

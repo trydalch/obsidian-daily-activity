@@ -13,24 +13,24 @@ export class ActivityLogger {
     this.plugin = plugin
   }
 
-  private getLinksToFilesModifiedOnDate(moment: Moment) {
+  private getLinksToFilesModifiedOnDate(moment: Moment, makeLink=true) {
     let files = this.app.vault.getFiles()
     let links: string[] = []
     files.forEach((f) => {
       if (moment.isSame(new Date(f.stat.mtime), 'day')) {
-        links.push(`[[${getLinkpath(f.path)}]]`)
+        makeLink ? links.push(`[[${getLinkpath(f.path)}]]`) : links.push(getLinkpath(f.path))
       }
     })
 
     return links
   }
 
-  private getLinksToFilesCreatedOnDate(moment: Moment) {
+  private getLinksToFilesCreatedOnDate(moment: Moment, makeLink=true) {
     let files = this.app.vault.getFiles()
     let links: string[] = []
     files.forEach((f) => {
       if (moment.isSame(new Date(f.stat.ctime), 'day')) {
-        links.push(`[[${getLinkpath(f.path)}]]`)
+        makeLink ? links.push(`[[${getLinkpath(f.path)}]]`) : links.push(getLinkpath(f.path))
       }
     })
 
@@ -42,7 +42,6 @@ export class ActivityLogger {
       existingContent +
       `
 
-## ${header} Today: 
 ${links.join('\n')}
 `
     )
@@ -53,11 +52,13 @@ ${links.join('\n')}
     insertModifiedToday = false,
     moment = window.moment(),
     activeView = null,
+    makeLink = true
   }: {
     insertCreatedToday?: boolean
     insertModifiedToday?: boolean
     moment?: Moment
-    activeView?: MarkdownView
+    activeView?: MarkdownView,
+    makeLink?: boolean
   }) {
     if (activeView == null) {
       return
@@ -68,11 +69,11 @@ ${links.join('\n')}
     let content = await this.app.vault.read(activeView.file)
     let createdTodayLinks: string[] = []
     if (insertCreatedToday) {
-      createdTodayLinks = this.getLinksToFilesCreatedOnDate(moment)
+      createdTodayLinks = this.getLinksToFilesCreatedOnDate(moment, makeLink)
       content = this.appendLinksToContent(content, createdTodayLinks, 'Created')
     }
     if (insertModifiedToday) {
-      let modifiedTodayLinks: string[] = this.getLinksToFilesModifiedOnDate(moment).filter(
+      let modifiedTodayLinks: string[] = this.getLinksToFilesModifiedOnDate(moment, makeLink).filter(
         (link) => createdTodayLinks.indexOf(link) === -1
       )
       content = this.appendLinksToContent(content, modifiedTodayLinks, 'Modified')
