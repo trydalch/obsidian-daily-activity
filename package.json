@@ -7,7 +7,7 @@
     "dev": "rollup --config rollup.config.js -w",
     "cpd": "cp ./build/dev-manifest.json ./build/manifest.json",
     "cp": "cp manifest.json ./build",
-    "build": "npm run cp && rollup --config rollup.config.js",
+    "build": "rollup --config rollup.config.js && npm run cp",
     "dev-build": "npm run cpd && rollup --config rollup.config.js",
     "dev-deploy": "cp -r ./build/* $OBSPLUGINDIR/dev-daily-activity",
     "bd": "npm run dev-build  && npm run cpd && npm run dev-deploy"
