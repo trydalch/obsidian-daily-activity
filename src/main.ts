@@ -98,12 +98,7 @@ export default class DailyActivityPlugin extends Plugin {
 
         this.activityLogger.insertActivityLog({ insertCreatedToday: true, activeView, makeLink: false })
       },
-      hotkeys: [
-        {
-          modifiers: ['Alt'],
-          key: 'c',
-        },
-      ],
+      hotkeys: [],
     })
 
     this.addCommand({
@@ -121,12 +116,7 @@ export default class DailyActivityPlugin extends Plugin {
 
         this.activityLogger.insertActivityLog({ insertModifiedToday: true, activeView, makeLink: false })
       },
-      hotkeys: [
-        {
-          modifiers: ['Alt'],
-          key: 'm',
-        },
-      ],
+      hotkeys: [],
     })
 
     this.addCommand({
