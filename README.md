@@ -11,12 +11,15 @@ Please open an issue for any bugs, feature requests, or feedback at https://gith
 
 ## Commands
 
-| Command                       | Description                                                                                                          |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Links to Files Created Today  | Inserts a list of links to files created today                                                                       |
-| Links to Files Modified Today | Inserts a list of links to files modified today                                                                      |
-| Stats for date                | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. Supports natural language dates See below for an example. |
-| (Deprecated) Today's Stats    | Inserts a table containing stats from today's writing activity. <br> **Will be removed in future version**           |
+| Command                                 | Description|
+| --------------------------------------- |  |
+| Links to Files Created Today            |                                                                                                                                                                    |
+| Links to Files Modified Today           |                                                                                                                                                                   |
+| Plain Text List of Files Created Today  | Inserts a list of files created today|
+| Plain Text List of Files Modified Today | Inserts a list of files modified today                                                                            |
+| Stats for date                          | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. Supports natural language dates See below for an example. |
+| (Deprecated) Today's Stats              | Inserts a table containing stats from today's writing activity. <br\> \*\*Will be removed in future version\*\*|
+
 
 ## Examples
 - **Stats for date**
