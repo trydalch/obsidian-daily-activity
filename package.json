@@ -1,6 +1,6 @@
 {
   "name": "obsidian-daily-activity",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "This is a plugin for Obsidian (https://obsidian.md).",
   "main": "build/main.js",
   "scripts": {
