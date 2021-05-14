@@ -102,7 +102,7 @@ export default class DailyActivityPlugin extends Plugin {
     })
 
     this.addCommand({
-      id: 'links-to-files-modified-today',
+      id: 'files-modified-today',
       name: 'Plain Text List of Files Modified Today',
       checkCallback: (checking: boolean) => {
         let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
