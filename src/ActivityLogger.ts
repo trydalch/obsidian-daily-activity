@@ -48,34 +48,36 @@ ${links.join('\n')}
   }
 
   async insertActivityLog({
-    insertCreatedToday = false,
-    insertModifiedToday = false,
-    moment = window.moment(),
+    insertCreatedOnDateFiles = false,
+    insertModifiedOnDateFiles = false,
+    moments = [window.moment()],
     activeView = null,
     makeLink = true
   }: {
-    insertCreatedToday?: boolean
-    insertModifiedToday?: boolean
-    moment?: Moment
+    insertCreatedOnDateFiles?: boolean
+    insertModifiedOnDateFiles?: boolean
+    moments?: Moment[]
     activeView?: MarkdownView,
     makeLink?: boolean
   }) {
     if (activeView == null) {
       return
     }
-    let editor = activeView.sourceMode.cmEditor
+    let editor = activeView.editor
     let doc = editor.getDoc()
 
     let content = await this.app.vault.read(activeView.file)
     let createdTodayLinks: string[] = []
-    if (insertCreatedToday) {
-      createdTodayLinks = this.getLinksToFilesCreatedOnDate(moment, makeLink)
+    if (insertCreatedOnDateFiles) {
+      createdTodayLinks = moments.flatMap((moment) => this.getLinksToFilesCreatedOnDate(moment, makeLink))
+      console.log(createdTodayLinks.length, ' Files found created on these date(s): ', moments.map(m => m.date()))
       content = this.appendLinksToContent(content, createdTodayLinks, 'Created')
     }
-    if (insertModifiedToday) {
-      let modifiedTodayLinks: string[] = this.getLinksToFilesModifiedOnDate(moment, makeLink).filter(
+    if (insertModifiedOnDateFiles) {
+      let modifiedTodayLinks: string[] = moments.flatMap((moment) =>this.getLinksToFilesModifiedOnDate(moment, makeLink).filter(
         (link) => createdTodayLinks.indexOf(link) === -1
-      )
+      ))
+      console.log(modifiedTodayLinks.length, ' Files found modified on these date(s): ', moments.map(m => m.date()))
       content = this.appendLinksToContent(content, modifiedTodayLinks, 'Modified')
     }
 

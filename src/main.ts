@@ -39,7 +39,7 @@ export default class DailyActivityPlugin extends Plugin {
 
     this.addCommand({
       id: 'links-to-files-created-today',
-      name: 'Links to Files Created Today',
+      name: "Links to Files Created Today for date (default's for today)",
       checkCallback: (checking: boolean) => {
         let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (activeView == null) {
@@ -50,7 +50,7 @@ export default class DailyActivityPlugin extends Plugin {
           return true
         }
 
-        this.activityLogger.insertActivityLog({ insertCreatedToday: true, activeView })
+        this.activityLogger.insertActivityLog({ insertCreatedOnDateFiles: true, activeView, moments: this.getDates(activeView) })
       },
       hotkeys: [
         {
@@ -62,7 +62,7 @@ export default class DailyActivityPlugin extends Plugin {
 
     this.addCommand({
       id: 'links-to-files-modified-today',
-      name: 'Links to Files Modified Today',
+      name: "Links to Files Modified for date (default's for today)",
       checkCallback: (checking: boolean) => {
         let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (activeView == null) {
@@ -73,7 +73,7 @@ export default class DailyActivityPlugin extends Plugin {
           return true
         }
 
-        this.activityLogger.insertActivityLog({ insertModifiedToday: true, activeView })
+        this.activityLogger.insertActivityLog({ insertModifiedOnDateFiles: true, activeView, moments: this.getDates(activeView) })
       },
       hotkeys: [
         {
@@ -85,7 +85,7 @@ export default class DailyActivityPlugin extends Plugin {
 
     this.addCommand({
       id: 'files-created-today',
-      name: 'Plain Text List of Files Created Today',
+      name: "Plain Text List of Files Created for date (default's for today)",
       checkCallback: (checking: boolean) => {
         let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (activeView == null) {
@@ -96,14 +96,14 @@ export default class DailyActivityPlugin extends Plugin {
           return true
         }
 
-        this.activityLogger.insertActivityLog({ insertCreatedToday: true, activeView, makeLink: false })
+        this.activityLogger.insertActivityLog({ insertCreatedOnDateFiles: true, activeView, makeLink: false, moments: this.getDates(activeView) })
       },
       hotkeys: [],
     })
 
     this.addCommand({
       id: 'files-modified-today',
-      name: 'Plain Text List of Files Modified Today',
+      name: "Plain Text List of Files Modified for date (default's for today)",
       checkCallback: (checking: boolean) => {
         let activeView = this.app.workspace.getActiveViewOfType(MarkdownView)
         if (activeView == null) {
@@ -114,7 +114,7 @@ export default class DailyActivityPlugin extends Plugin {
           return true
         }
 
-        this.activityLogger.insertActivityLog({ insertModifiedToday: true, activeView, makeLink: false })
+        this.activityLogger.insertActivityLog({ insertModifiedOnDateFiles: true, activeView, makeLink: false, moments: this.getDates(activeView) })
       },
       hotkeys: [],
     })
@@ -170,7 +170,7 @@ export default class DailyActivityPlugin extends Plugin {
   }
 
   getDates(activeView: MarkdownView): Moment[] {
-    let editor = activeView.sourceMode.cmEditor
+    let editor = activeView.editor
     const dp = new DateParser()
 
     if (!editor || !editor.somethingSelected()) {
@@ -179,7 +179,7 @@ export default class DailyActivityPlugin extends Plugin {
     }
 
     let selection = editor.getSelection()
-    console.log(selection.contains('to'))
+    console.log('Selection contains a date range: ', selection.contains('to'))
 
     let moments: Moment[] = []
     if (selection.contains('to')) {
