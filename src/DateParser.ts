@@ -1,5 +1,5 @@
 /** @format */
-import chrono from 'chrono-node'
+import * as chrono from 'chrono-node'
 import { Moment } from 'moment'
 
 export default class DateParser {
