@@ -1,6 +1,6 @@
 /** @format */
 
-import { App, ButtonComponent, Modal, TextComponent } from 'obsidian'
+import {App, ButtonComponent, Modal, TextComponent} from 'obsidian'
 
 class ActivityModal extends Modal {
   constructor(app: App) {
