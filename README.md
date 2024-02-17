@@ -11,14 +11,14 @@ Please open an issue for any bugs, feature requests, or feedback at https://gith
 
 ## Commands
 
-| Command                                 | Description                                                                                                                                                                                                      |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Links to Files Created Today            | Inserts a list of links to files created today                                                                                                                                                                   |
-| Links to Files Modified Today           | Inserts a list of links to files modified today                                                                                                                                                                  |
-| Plain Text List of Files Created Today  | Inserts a list of files created today                                                                                                                                                                            |
-| Plain Text List of Files Modified Today | Inserts a list of files modified today                                                                                                                                                                           |
-| Stats for date                          | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. Supports natural language dates See below for an example. |
-| (Deprecated) Today's Stats              | Inserts a table containing stats from today's writing activity. <br\> **Will be removed in future version**                                                                                                      |
+| Command                                             | Description                                                                                                                                                                                                      |
+|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Links to Files Created from date to date            | Inserts a list of links to files created  between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters.      Supports natural language dates.         |
+| Links to Files Modified from date to date           | Inserts a list of links to files modified  between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters.      Supports natural language dates.        |
+| Plain Text List of Files Created from date to date  | Inserts a list of files created between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters.  Supports natural language dates.                       |
+| Plain Text List of Files Modified from date to date | Inserts a list of files modified between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters.         Supports natural language dates.               |
+| Stats for date                                      | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. Supports natural language dates See below for an example. |
+| (Deprecated) Today's Stats                          | Inserts a table containing stats from today's writing activity. <br\> **Will be removed in future version**                                                                                                      |
 
 
 ## Examples
