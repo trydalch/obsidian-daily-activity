@@ -7,7 +7,17 @@ export default class FilterModal extends Modal {
     }
 
     onOpen() {
-        const dateParser = new DateParser(); // Создаем экземпляр DateParser
+        const titleElement = document.createElement('h3');
+        titleElement.textContent = 'Filters';
+        this.contentEl.appendChild(titleElement);
+
+        const descriptionElement = document.createElement('p');
+        descriptionElement.textContent = "Use filters as needed. Leave fields blank to skip filtering. Default date is 'today'.";
+        descriptionElement.style.fontSize = '14px';
+        this.contentEl.appendChild(descriptionElement);
+
+
+        const dateParser = new DateParser();
 
         let inputFromDateField = new TextComponent(this.contentEl).setPlaceholder('From (any format)');
         let inputToDateField = new TextComponent(this.contentEl).setPlaceholder('To (any format)');
@@ -16,7 +26,10 @@ export default class FilterModal extends Modal {
         let includePathsField = new TextComponent(this.contentEl).setPlaceholder('Include paths (comma separated)');
         let excludePathsField = new TextComponent(this.contentEl).setPlaceholder('Exclude paths (comma separated)');
 
-        new ButtonComponent(this.contentEl)
+        const buttonContainer = this.contentEl.createDiv();
+        buttonContainer.style.marginTop = '20px';
+
+        new ButtonComponent(buttonContainer)
             .setButtonText('Apply')
             .onClick(() => {
                 let fromDate = dateParser.parseDate(inputFromDateField.getValue().trim());
