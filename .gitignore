@@ -1,9 +1,37 @@
+# Build output
+build/
+
+# Node modules
+node_modules/
+
+# Editor specific files
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Keep test vault but ignore Obsidian workspace files
+test-vault/.obsidian/workspace*
+test-vault/.obsidian/app.json
+test-vault/.obsidian/appearance.json
+test-vault/.obsidian/hotkeys.json
+test-vault/.obsidian/core-plugins.json
+test-vault/.obsidian/community-plugins.json
+
+# Keep the plugins directory structure
+!test-vault/.obsidian/plugins/
+test-vault/.obsidian/plugins/*
+!test-vault/.obsidian/plugins/dev-daily-activity/
+test-vault/.obsidian/plugins/dev-daily-activity/*
+
 # npm
-node_modules
 package-lock.json
 npm-debug.log
 
 # build
-build/
 **/*.js.map
 debug.log

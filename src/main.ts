@@ -1,27 +1,44 @@
 /** @format */
 
-import {Moment} from 'moment'
-import {MarkdownView, Plugin} from 'obsidian'
-import {ActivityLogger} from 'src/ActivityLogger'
+import { Moment } from 'moment'
+import { MarkdownView, Plugin } from 'obsidian'
+import { ActivityLogger } from 'src/ActivityLogger'
 import DateParser from 'src/DateParser'
 import FilterModal from 'src/modal/FilterModal'
+import { DailyActivitySettingsTab } from 'src/settings/SettingsTab'
 
 interface DailyActivityPluginSettings {
-    // TODO:
-    // insert location: cursor, top of file, end of file
-    // lists to generate: Created & modified? Just created? Just modified?
-    // Exclude modified from created table
-    // Include current note?
-    // Include header?
-    // Custom header values
-    // template for inserting?
-    // plain text or link?
+    insertLocation: 'cursor' | 'end';
+    defaultLinkStyle: 'link' | 'plain';
+    includeHeader: boolean;
+    headerStyle: string;
+    excludeCurrentNote: boolean;
+    // Filter settings
+    includeRegex: string[];
+    excludeRegex: string[];
+    includePaths: string[];
+    excludePaths: string[];
+    // Whether to show filter dialog
+    showFilterDialog: boolean;
 }
 
 // TODO:
 // Track activity using events (file created, file modified, file opened, track additions/deletions by capturing file length on open/close (or focus/lose focus))
 
-const DEFAULT_SETTINGS: DailyActivityPluginSettings = {}
+const DEFAULT_SETTINGS: DailyActivityPluginSettings = {
+    insertLocation: 'cursor',
+    defaultLinkStyle: 'link',
+    includeHeader: true,
+    headerStyle: '## Files {type} on {date}',
+    excludeCurrentNote: false,
+    // Default empty filters
+    includeRegex: [],
+    excludeRegex: [],
+    includePaths: [],
+    excludePaths: [],
+    // Default to show filter dialog
+    showFilterDialog: true
+}
 
 export default class DailyActivityPlugin extends Plugin {
     settings: DailyActivityPluginSettings
@@ -30,9 +47,12 @@ export default class DailyActivityPlugin extends Plugin {
     async onload() {
         console.log('loading plugin')
 
-        // await this.loadSettings();
+        await this.loadSettings();
 
         this.activityLogger = new ActivityLogger(this.app, this)
+
+        // Add settings tab
+        this.addSettingTab(new DailyActivitySettingsTab(this.app, this));
 
         this.addCommand({
             id: 'links-to-files-created-today',
@@ -47,8 +67,26 @@ export default class DailyActivityPlugin extends Plugin {
                     return true
                 }
 
-                new FilterModal(this.app, (fromDate, toDate, includeRegex: any, excludeRegex: any, includePaths: any, excludePaths: any) => {
-                    let moments = this.getMoments(fromDate, toDate, activeView);
+                if (this.settings.showFilterDialog) {
+                    // Show filter dialog
+                    new FilterModal(this.app, (fromDate, toDate, includeRegex: any, excludeRegex: any, includePaths: any, excludePaths: any) => {
+                        let moments = this.getMoments(fromDate, toDate, activeView);
+                        this.activityLogger.insertActivityLog(
+                            {
+                                insertCreatedOnDateFiles: true,
+                                insertModifiedOnDateFiles: false,
+                                moments: moments,
+                                activeView,
+                                makeLink: true,
+                                includeRegex,
+                                excludeRegex,
+                                includePaths,
+                                excludePaths
+                            });
+                    }).open();
+                } else {
+                    // Use filters from settings
+                    let moments = this.getDates(activeView);
                     this.activityLogger.insertActivityLog(
                         {
                             insertCreatedOnDateFiles: true,
@@ -56,12 +94,12 @@ export default class DailyActivityPlugin extends Plugin {
                             moments: moments,
                             activeView,
                             makeLink: true,
-                            includeRegex,
-                            excludeRegex,
-                            includePaths,
-                            excludePaths
+                            includeRegex: this.settings.includeRegex,
+                            excludeRegex: this.settings.excludeRegex,
+                            includePaths: this.settings.includePaths,
+                            excludePaths: this.settings.excludePaths
                         });
-                }).open();
+                }
             },
             hotkeys: [
                 {
@@ -84,8 +122,26 @@ export default class DailyActivityPlugin extends Plugin {
                     return true
                 }
 
-                new FilterModal(this.app, (fromDate, toDate, includeRegex: any, excludeRegex: any, includePaths: any, excludePaths: any) => {
-                    let moments = this.getMoments(fromDate, toDate, activeView);
+                if (this.settings.showFilterDialog) {
+                    // Show filter dialog
+                    new FilterModal(this.app, (fromDate, toDate, includeRegex: any, excludeRegex: any, includePaths: any, excludePaths: any) => {
+                        let moments = this.getMoments(fromDate, toDate, activeView);
+                        this.activityLogger.insertActivityLog(
+                            {
+                                insertCreatedOnDateFiles: false,
+                                insertModifiedOnDateFiles: true,
+                                moments: moments,
+                                activeView,
+                                makeLink: true,
+                                includeRegex,
+                                excludeRegex,
+                                includePaths,
+                                excludePaths
+                            });
+                    }).open();
+                } else {
+                    // Use filters from settings
+                    let moments = this.getDates(activeView);
                     this.activityLogger.insertActivityLog(
                         {
                             insertCreatedOnDateFiles: false,
@@ -93,12 +149,12 @@ export default class DailyActivityPlugin extends Plugin {
                             moments: moments,
                             activeView,
                             makeLink: true,
-                            includeRegex,
-                            excludeRegex,
-                            includePaths,
-                            excludePaths
+                            includeRegex: this.settings.includeRegex,
+                            excludeRegex: this.settings.excludeRegex,
+                            includePaths: this.settings.includePaths,
+                            excludePaths: this.settings.excludePaths
                         });
-                }).open();
+                }
             },
             hotkeys: [
                 {
@@ -121,8 +177,26 @@ export default class DailyActivityPlugin extends Plugin {
                     return true
                 }
 
-                new FilterModal(this.app, (fromDate, toDate, includeRegex: any, excludeRegex: any, includePaths: any, excludePaths: any) => {
-                    let moments = this.getMoments(fromDate, toDate, activeView);
+                if (this.settings.showFilterDialog) {
+                    // Show filter dialog
+                    new FilterModal(this.app, (fromDate, toDate, includeRegex: any, excludeRegex: any, includePaths: any, excludePaths: any) => {
+                        let moments = this.getMoments(fromDate, toDate, activeView);
+                        this.activityLogger.insertActivityLog(
+                            {
+                                insertCreatedOnDateFiles: true,
+                                insertModifiedOnDateFiles: false,
+                                moments: moments,
+                                activeView,
+                                makeLink: false,
+                                includeRegex,
+                                excludeRegex,
+                                includePaths,
+                                excludePaths
+                            });
+                    }).open();
+                } else {
+                    // Use filters from settings
+                    let moments = this.getDates(activeView);
                     this.activityLogger.insertActivityLog(
                         {
                             insertCreatedOnDateFiles: true,
@@ -130,12 +204,12 @@ export default class DailyActivityPlugin extends Plugin {
                             moments: moments,
                             activeView,
                             makeLink: false,
-                            includeRegex,
-                            excludeRegex,
-                            includePaths,
-                            excludePaths
+                            includeRegex: this.settings.includeRegex,
+                            excludeRegex: this.settings.excludeRegex,
+                            includePaths: this.settings.includePaths,
+                            excludePaths: this.settings.excludePaths
                         });
-                }).open();
+                }
             },
             hotkeys: [],
         })
@@ -153,20 +227,38 @@ export default class DailyActivityPlugin extends Plugin {
                     return true
                 }
 
-                new FilterModal(this.app, (fromDate, toDate, includeRegex: any, excludeRegex: any, includePaths: any, excludePaths: any) => {
-                    let moments = this.getMoments(fromDate, toDate, activeView);
+                if (this.settings.showFilterDialog) {
+                    // Show filter dialog
+                    new FilterModal(this.app, (fromDate, toDate, includeRegex: any, excludeRegex: any, includePaths: any, excludePaths: any) => {
+                        let moments = this.getMoments(fromDate, toDate, activeView);
+                        this.activityLogger.insertActivityLog(
+                            {
+                                insertCreatedOnDateFiles: false,
+                                insertModifiedOnDateFiles: true,
+                                moments: moments,
+                                makeLink: false,
+                                includeRegex,
+                                excludeRegex,
+                                includePaths,
+                                excludePaths
+                            });
+                    }).open();
+                } else {
+                    // Use filters from settings
+                    let moments = this.getDates(activeView);
                     this.activityLogger.insertActivityLog(
                         {
                             insertCreatedOnDateFiles: false,
                             insertModifiedOnDateFiles: true,
                             moments: moments,
+                            activeView,
                             makeLink: false,
-                            includeRegex,
-                            excludeRegex,
-                            includePaths,
-                            excludePaths
+                            includeRegex: this.settings.includeRegex,
+                            excludeRegex: this.settings.excludeRegex,
+                            includePaths: this.settings.includePaths,
+                            excludePaths: this.settings.excludePaths
                         });
-                }).open();
+                }
             },
             hotkeys: [],
         })
@@ -184,7 +276,7 @@ export default class DailyActivityPlugin extends Plugin {
                     return true
                 }
 
-                this.activityLogger.insertFileStats({activeView})
+                this.activityLogger.insertFileStats({ activeView })
             },
         })
 
@@ -204,7 +296,7 @@ export default class DailyActivityPlugin extends Plugin {
                 let moments = this.getDates(activeView)
                 console.log(`${moments}`)
 
-                this.activityLogger.insertFileStats({activeView, moments})
+                this.activityLogger.insertFileStats({ activeView, moments })
             },
         })
     }

@@ -5,12 +5,16 @@
   "main": "build/main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
-    "cpd": "cp ./dev-manifest.json ./build/manifest.json",
-    "cp": "cp manifest.json ./build",
+    "cpd": "shx cp ./dev-manifest.json ./build/manifest.json",
+    "cp": "shx cp manifest.json ./build",
     "build": "rollup --config rollup.config.js && npm run cp",
     "dev-build": "npm run cpd && rollup --config rollup.config.js",
-    "dev-deploy": "cp -r ./build/* $OBSPLUGINDIR/dev-daily-activity",
-    "bd": "npm run dev-build  && npm run cpd && npm run dev-deploy"
+    "dev-deploy": "shx cp -r ./build/* ./test-vault/.obsidian/plugins/dev-daily-activity",
+    "bd": "npm run dev-build && npm run cpd && npm run dev-deploy",
+    "test-vault": "obsidian test-vault"
+  },
+  "config": {
+    "plugin_dir": "C:\\Users\\Trevor.Rydalch\\OneDrive\\Documents\\Obsidian Vaults\\plugin test\\plugin test\\.obsidian\\plugins"
   },
   "keywords": [],
   "author": "",
@@ -21,8 +25,10 @@
     "@rollup/plugin-typescript": "^6.0.0",
     "@types/moment": "^2.13.0",
     "@types/node": "^14.14.2",
+    "cross-env": "^7.0.3",
     "obsidian": "https://github.com/obsidianmd/obsidian-api/tarball/master",
     "rollup": "^2.32.1",
+    "shx": "^0.3.4",
     "tslib": "^2.0.3",
     "typescript": "^4.0.3"
   },
