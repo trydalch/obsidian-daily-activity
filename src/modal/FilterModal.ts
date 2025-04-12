@@ -1,49 +1,85 @@
-import {App, ButtonComponent, Modal, TextComponent} from 'obsidian';
-import DateParser from 'src/DateParser';
+import { App, ButtonComponent, Modal, TextComponent } from 'obsidian';
+import DateParser from '../DateParser';
+import DailyActivityPlugin from '../main';
+import moment from 'moment';
 
 export default class FilterModal extends Modal {
-    constructor(app: App, public onSubmit: (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => void) {
+    private onSubmit: (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => void;
+    private plugin: DailyActivityPlugin;
+
+    constructor(app: App, plugin: DailyActivityPlugin, onSubmit: (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => void) {
         super(app);
+        this.onSubmit = onSubmit;
+        this.plugin = plugin;
     }
 
     onOpen() {
-        const titleElement = document.createElement('h3');
-        titleElement.textContent = 'Filters';
-        this.contentEl.appendChild(titleElement);
+        const { contentEl } = this;
+        const dateParser = new DateParser(this.plugin);
 
-        const descriptionElement = document.createElement('p');
-        descriptionElement.textContent = "Use filters as needed. Leave fields blank to skip filtering. Default date is 'today'.";
-        descriptionElement.style.fontSize = '14px';
-        this.contentEl.appendChild(descriptionElement);
+        // Date range
+        contentEl.createEl('h3', { text: 'Date Range' });
+        contentEl.createEl('p', { text: 'Leave empty to use today\'s date' });
 
+        const dateContainer = contentEl.createDiv();
+        const inputFromDateField = new TextComponent(dateContainer)
+            .setPlaceholder('From date (YYYY-MM-DD)');
+        dateContainer.createEl('br');
+        const inputToDateField = new TextComponent(dateContainer)
+            .setPlaceholder('To date (YYYY-MM-DD)');
 
-        const dateParser = new DateParser();
+        // Filters
+        contentEl.createEl('h3', { text: 'Filters (Optional)' });
+        contentEl.createEl('p', { text: 'One item per line' });
 
-        let inputFromDateField = new TextComponent(this.contentEl).setPlaceholder('From (any format)');
-        let inputToDateField = new TextComponent(this.contentEl).setPlaceholder('To (any format)');
-        let includeRegexField = new TextComponent(this.contentEl).setPlaceholder('Include regex (comma separated)');
-        let excludeRegexField = new TextComponent(this.contentEl).setPlaceholder('Exclude regex (comma separated)');
-        let includePathsField = new TextComponent(this.contentEl).setPlaceholder('Include paths (comma separated)');
-        let excludePathsField = new TextComponent(this.contentEl).setPlaceholder('Exclude paths (comma separated)');
+        // Include regex
+        const includeRegexContainer = contentEl.createDiv();
+        contentEl.createEl('h4', { text: 'Include Regex Patterns' });
+        const includeRegexField = new TextComponent(includeRegexContainer)
+            .setPlaceholder('Regex patterns to include');
 
-        const buttonContainer = this.contentEl.createDiv();
-        buttonContainer.style.marginTop = '20px';
+        // Exclude regex
+        const excludeRegexContainer = contentEl.createDiv();
+        contentEl.createEl('h4', { text: 'Exclude Regex Patterns' });
+        const excludeRegexField = new TextComponent(excludeRegexContainer)
+            .setPlaceholder('Regex patterns to exclude');
 
-        new ButtonComponent(buttonContainer)
-            .setButtonText('Apply')
-            .onClick(() => {
-                let fromDate = dateParser.parseDate(inputFromDateField.getValue().trim());
-                let toDate = dateParser.parseDate(inputToDateField.getValue().trim());
-                const includeRegex = includeRegexField.getValue().split(',').map(s => s.trim());
-                const excludeRegex = excludeRegexField.getValue().split(',').map(s => s.trim());
-                const includePaths = includePathsField.getValue().split(',').map(s => s.trim());
-                const excludePaths = excludePathsField.getValue().split(',').map(s => s.trim());
+        // Include paths
+        const includePathsContainer = contentEl.createDiv();
+        contentEl.createEl('h4', { text: 'Include Paths' });
+        const includePathsField = new TextComponent(includePathsContainer)
+            .setPlaceholder('Paths to include');
 
-                fromDate = fromDate ? fromDate : new Date();
-                toDate = toDate ? toDate : new Date();
+        // Exclude paths
+        const excludePathsContainer = contentEl.createDiv();
+        contentEl.createEl('h4', { text: 'Exclude Paths' });
+        const excludePathsField = new TextComponent(excludePathsContainer)
+            .setPlaceholder('Paths to exclude');
 
-                this.onSubmit(fromDate.toString(), toDate.toString(), includeRegex, excludeRegex, includePaths, excludePaths);
+        // Submit button
+        const submitBtn = new ButtonComponent(contentEl)
+            .setButtonText('Apply Filters')
+            .onClick(async () => {
+                // Parse dates
+                const fromDateStr = inputFromDateField.getValue().trim();
+                const toDateStr = inputToDateField.getValue().trim();
+
+                let fromDate = fromDateStr ? dateParser.parseDate(fromDateStr).start.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+                let toDate = toDateStr ? dateParser.parseDate(toDateStr).end.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+
+                // Parse filters
+                const includeRegex = includeRegexField.getValue().split('\n').map(s => s.trim()).filter(s => s.length > 0);
+                const excludeRegex = excludeRegexField.getValue().split('\n').map(s => s.trim()).filter(s => s.length > 0);
+                const includePaths = includePathsField.getValue().split('\n').map(s => s.trim()).filter(s => s.length > 0);
+                const excludePaths = excludePathsField.getValue().split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
+                this.onSubmit(fromDate, toDate, includeRegex, excludeRegex, includePaths, excludePaths);
                 this.close();
             });
+    }
+
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
     }
 }

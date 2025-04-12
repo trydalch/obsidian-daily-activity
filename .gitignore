@@ -35,3 +35,5 @@ npm-debug.log
 # build
 **/*.js.map
 debug.log
+
+docs/
