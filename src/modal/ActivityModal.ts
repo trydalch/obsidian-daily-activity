@@ -1,16 +1,20 @@
 /** @format */
 
-import {App, ButtonComponent, Modal, TextComponent} from 'obsidian'
+import { App, ButtonComponent, Modal, TextComponent } from 'obsidian'
+import DailyActivityPlugin from '../main'
 
-class ActivityModal extends Modal {
-  constructor(app: App) {
+export default class ActivityModal extends Modal {
+  plugin: DailyActivityPlugin
+
+  constructor(app: App, plugin: DailyActivityPlugin) {
     super(app)
+    this.plugin = plugin
   }
 
   onOpen() {
+    this.plugin.logger.debug('Opening activity modal')
     let _this: Modal = this
-    console.debug(_this)
-    let {contentEl} = this;
+    let { contentEl } = this;
     let inputFromDateField = new TextComponent(contentEl).setPlaceholder('From')
     let inputToDateField = new TextComponent(contentEl).setPlaceholder('To')
     let inputButton = new ButtonComponent(contentEl).setButtonText('Get Stats').onClick(() => {
