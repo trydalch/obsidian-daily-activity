@@ -1,3 +1,5 @@
+
+
 # Test Vault for Daily Activity Plugin
 
 This is a test vault for developing and testing the Obsidian Daily Activity Plugin. It provides a consistent environment for plugin development and testing.
@@ -25,3 +27,5 @@ When you run `npm run dev-deploy`, the plugin will be automatically copied to th
 - This vault is included in the repository to ensure consistent development environment
 - Workspace settings and other personal Obsidian configurations are gitignored
 - Only the plugin-specific files and test data will be tracked in git 
+
+
