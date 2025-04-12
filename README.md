@@ -13,12 +13,20 @@ Please open an issue for any bugs, feature requests, or feedback at https://gith
 
 | Command                                             | Description                                                                                                                                                                                                      |
 |-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Links to Files Created from date to date            | Inserts a list of links to files created  between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters.      Supports natural language dates.         |
-| Links to Files Modified from date to date           | Inserts a list of links to files modified  between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters.      Supports natural language dates.        |
-| Plain Text List of Files Created from date to date  | Inserts a list of files created between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters.  Supports natural language dates.                       |
-| Plain Text List of Files Modified from date to date | Inserts a list of files modified between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters.         Supports natural language dates.               |
-| Stats for date                                      | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. Supports natural language dates See below for an example. |
+| Links to Files Created from date to date            | Inserts a list of links to files created between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters. Supports natural language dates.                |
+| Links to Files Modified from date to date           | Inserts a list of links to files modified between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters. Supports natural language dates.               |
+| Plain Text List of Files Created from date to date  | Inserts a list of files created between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters. Supports natural language dates.                         |
+| Plain Text List of Files Modified from date to date | Inserts a list of files modified between two dates. You can specify dates and filters in the modal window. The default is today and there are no filters. Supports natural language dates.                        |
+| Stats for date                                      | Inserts a table with counts of files modified & files created by date. Defaults for today, but dates can be specified by selecting them in the editor. Supports natural language dates. See below for an example. |
 | (Deprecated) Today's Stats                          | Inserts a table containing stats from today's writing activity. <br\> **Will be removed in future version**                                                                                                      |
+| View Recent Activity Logs                           | Displays a formatted log of your recent activity from the last 24 hours, including event types and file changes.                                                                                                 |
+| Daily Summary                                       | Inserts a summary of today's activity including total events, event types breakdown, and content changes.                                                                                                        |
+| Weekly Overview                                     | Generates a comprehensive overview of your activity for the past 7 days, with daily breakdowns and weekly totals.                                                                                                |
+| Today's Timeline                                    | Creates a chronological timeline of today's activity, organized by hour and event type.                                                                                                                          |
+| Export Activity Data                                | Exports your activity data to CSV or JSON format with customizable date ranges and fields.                                                                                                                       |
+| Generate Activity Dashboard                         | Creates a comprehensive dashboard with visualizations of your activity data.                                                                                                                                     |
+| Refresh Dashboard                                   | Updates your activity dashboard with the latest data.                                                                                                                                                            |
+| Clear Failed Operations                             | Clears any failed database operations that may have occurred during plugin operation.                                                                                                                            |
 
 ## Settings
 
@@ -43,6 +51,52 @@ The plugin now includes settings to customize its behavior:
 | Exclude regex patterns | Files matching these regex patterns will be excluded from the results (only available when "Show filter dialog" is disabled) |
 | Include paths | Files containing these path segments will be included in the results (only available when "Show filter dialog" is disabled) |
 | Exclude paths | Files containing these path segments will be excluded from the results (only available when "Show filter dialog" is disabled) |
+
+### Activity Tracking Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable activity tracking | Turns on/off the detailed tracking of file events |
+| Track file creation | When enabled, tracks creation of new files |
+| Track file modification | When enabled, tracks modifications to existing files |
+| Track file deletion | When enabled, tracks when files are deleted |
+| Track file rename | When enabled, tracks when files are renamed |
+| Content tracking debounce interval | The minimum time (in milliseconds) between content tracking events |
+| Database write debounce interval | The minimum time (in milliseconds) between database writes |
+| Activity tracking include paths | Paths to include in activity tracking |
+| Activity tracking exclude paths | Paths to exclude from activity tracking |
+
+### Batch Modification Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable modification batching | When enabled, combines multiple modifications into a single event after inactivity |
+| Inactivity threshold | Records modifications after this period of inactivity (in milliseconds) |
+
+### Export Settings
+
+| Setting | Description |
+|---------|-------------|
+| Default export format | Choose between CSV or JSON format for data exports |
+| Auto-export schedule | Set to never, daily, weekly, or monthly |
+| Auto-export path | Path in your vault to save exported files |
+| Export fields | Select which fields to include in your exports |
+
+### Dashboard Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable dashboard | Turns on/off the activity dashboard feature |
+| Dashboard path | The file path where the dashboard will be created |
+| Auto-update dashboard | When enabled, automatically updates the dashboard at set intervals |
+| Update interval (hours) | How often to automatically update the dashboard |
+| Use Charts plugin | When enabled, uses the Obsidian Charts plugin for visualizations if available |
+
+### Logging Settings
+
+| Setting | Description |
+|---------|-------------|
+| Log level | Controls the verbosity of plugin logs |
 
 ## Examples
 - **Stats for date**
