@@ -6,5 +6,6 @@
   "description": "A collection of commands to track your writing activity.",
   "author": "Trevor Rydalch",
   "authorUrl": "https://github.com/trydalch",
-  "isDesktopOnly": false
+  "isDesktopOnly": false,
+  "fundingUrl": "https://ko-fi.com/trydalch"
 }

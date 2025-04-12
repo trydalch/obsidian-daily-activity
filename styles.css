@@ -1,0 +1,47 @@
+/* Donate button */
+.daily-activity-donate-button {
+    display: inline-flex;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.daily-activity-donate-button button {
+    font-size: 12px;
+    padding: 2px 8px;
+    height: auto;
+    line-height: 1.5;
+    white-space: nowrap;
+    color: var(--text-on-accent);
+    background-color: var(--interactive-accent);
+    border-radius: 4px;
+    transition: background-color 0.1s ease-in-out;
+}
+
+.daily-activity-donate-button button:hover {
+    background-color: var(--interactive-accent-hover);
+}
+
+/* Donate section in settings */
+.daily-activity-donate-section {
+    padding: 10px 0;
+    margin-bottom: 15px;
+}
+
+.daily-activity-donate-link {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: #13C3FF;
+    /* Ko-fi blue */
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.daily-activity-donate-link:hover {
+    background-color: #00A8E1;
+    /* Darker Ko-fi blue */
+    color: white;
+    text-decoration: none;
+}
