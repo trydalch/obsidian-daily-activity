@@ -18,9 +18,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Clean npm cache
+        run: npm cache clean --force
           
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci --no-audit --prefer-offline --legacy-peer-deps || npm ci --no-audit --legacy-peer-deps
         
       - name: Build plugin
         run: npm run build
