@@ -1,7 +1,7 @@
 {
   "id": "daily-activity",
   "name": "Daily Activity",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "minAppVersion": "0.13.23",
   "description": "A collection of commands to track your writing activity.",
   "author": "Trevor Rydalch",
