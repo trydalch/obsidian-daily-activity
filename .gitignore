@@ -29,7 +29,6 @@ test-vault/.obsidian/plugins/*
 test-vault/.obsidian/plugins/dev-daily-activity/*
 
 # npm
-package-lock.json
 npm-debug.log
 
 # build
