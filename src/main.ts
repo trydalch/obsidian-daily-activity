@@ -3,7 +3,7 @@
 import { Moment } from 'moment'
 import { MarkdownView, Plugin, App, Editor, Modal, Notice, PluginSettingTab, Setting } from 'obsidian'
 import { ActivityLogger } from 'src/ActivityLogger'
-import DateParser from 'src/DateParser'
+import DateParser, { FilePeriod, rollingPeriod } from 'src/DateParser'
 import FilterModal from 'src/modal/FilterModal'
 import { DailyActivitySettingsTab } from 'src/settings/SettingsTab'
 import { ActivityDatabase, FileEvent } from './database/ActivityDatabase'
@@ -282,8 +282,7 @@ export default class DailyActivityPlugin extends Plugin {
 
                 if (this.settings.showFilterDialog) {
                     // Show filter dialog
-                    new FilterModal(this.app, this, (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => {
-                        let moments = this.getMoments(fromDate, toDate, activeView);
+                    new FilterModal(this.app, this, (moments: FilePeriod[], includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => {
                         this.activityLogger.insertActivityLog(
                             {
                                 insertCreatedOnDateFiles: true,
@@ -299,7 +298,7 @@ export default class DailyActivityPlugin extends Plugin {
                     }).open();
                 } else {
                     // Use filters from settings
-                    let moments = this.getDates(activeView);
+                    const moments = this.getFilePeriods(activeView);
                     this.activityLogger.insertActivityLog(
                         {
                             insertCreatedOnDateFiles: true,
@@ -337,8 +336,7 @@ export default class DailyActivityPlugin extends Plugin {
 
                 if (this.settings.showFilterDialog) {
                     // Show filter dialog
-                    new FilterModal(this.app, this, (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => {
-                        let moments = this.getMoments(fromDate, toDate, activeView);
+                    new FilterModal(this.app, this, (moments: FilePeriod[], includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => {
                         this.activityLogger.insertActivityLog(
                             {
                                 insertCreatedOnDateFiles: false,
@@ -354,7 +352,7 @@ export default class DailyActivityPlugin extends Plugin {
                     }).open();
                 } else {
                     // Use filters from settings
-                    let moments = this.getDates(activeView);
+                    const moments = this.getFilePeriods(activeView);
                     this.activityLogger.insertActivityLog(
                         {
                             insertCreatedOnDateFiles: false,
@@ -392,8 +390,7 @@ export default class DailyActivityPlugin extends Plugin {
 
                 if (this.settings.showFilterDialog) {
                     // Show filter dialog
-                    new FilterModal(this.app, this, (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => {
-                        let moments = this.getMoments(fromDate, toDate, activeView);
+                    new FilterModal(this.app, this, (moments: FilePeriod[], includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => {
                         this.activityLogger.insertActivityLog(
                             {
                                 insertCreatedOnDateFiles: true,
@@ -409,7 +406,7 @@ export default class DailyActivityPlugin extends Plugin {
                     }).open();
                 } else {
                     // Use filters from settings
-                    let moments = this.getDates(activeView);
+                    const moments = this.getFilePeriods(activeView);
                     this.activityLogger.insertActivityLog(
                         {
                             insertCreatedOnDateFiles: true,
@@ -442,13 +439,13 @@ export default class DailyActivityPlugin extends Plugin {
 
                 if (this.settings.showFilterDialog) {
                     // Show filter dialog
-                    new FilterModal(this.app, this, (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => {
-                        let moments = this.getMoments(fromDate, toDate, activeView);
+                    new FilterModal(this.app, this, (moments: FilePeriod[], includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => {
                         this.activityLogger.insertActivityLog(
                             {
                                 insertCreatedOnDateFiles: false,
                                 insertModifiedOnDateFiles: true,
                                 moments: moments,
+                                activeView,
                                 makeLink: false,
                                 includeRegex,
                                 excludeRegex,
@@ -458,7 +455,7 @@ export default class DailyActivityPlugin extends Plugin {
                     }).open();
                 } else {
                     // Use filters from settings
-                    let moments = this.getDates(activeView);
+                    const moments = this.getFilePeriods(activeView);
                     this.activityLogger.insertActivityLog(
                         {
                             insertCreatedOnDateFiles: false,
@@ -959,13 +956,9 @@ export default class DailyActivityPlugin extends Plugin {
         });
     }
 
-    private getMoments(fromDate: string, toDate: string, activeView: MarkdownView) {
-        if (fromDate && toDate) {
-            const dp = new DateParser(this)
-            return dp.parseDateRangeFromSelection(`${fromDate} to ${toDate}`)
-        } else {
-            return this.getDates(activeView)
-        }
+    private getFilePeriods(activeView: MarkdownView): FilePeriod[] {
+        const period = rollingPeriod(activeView.editor.getSelection());
+        return period ? [period] : this.getDates(activeView);
     }
 
     onunload() {

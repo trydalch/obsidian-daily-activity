@@ -28,6 +28,21 @@ Please open an issue for any bugs, feature requests, or feedback at https://gith
 | Refresh Dashboard                                   | Updates your activity dashboard with the latest data.                                                                                                                                                            |
 | Clear Failed Operations                             | Clears any failed database operations that may have occurred during plugin operation.                                                                                                                            |
 
+### Rolling periods for file lists
+
+To list files created or modified in a rolling period, start with `last` or
+`past`, followed by a positive whole number written in digits and one of
+`hour`, `hours`, `day`, or `days`. Examples include `last 1 hour`,
+`last 12 hours`, and `past 3 days`.
+
+Enter the period in the first date field and leave the second field empty.
+Leave both fields empty for today's calendar date. If the filter dialog is
+disabled, select the period in your note before running the file-list command.
+
+The period ends when you run the command. Each day counts as 24 elapsed hours.
+For example, at 02:00 on November 19, `last 5 hours` expands the header's
+`{date}` placeholder to `2026-11-18 21:00 – 2026-11-19 02:00`.
+
 ## Settings
 
 The plugin now includes settings to customize its behavior:

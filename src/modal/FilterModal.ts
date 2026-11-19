@@ -1,13 +1,13 @@
-import { App, ButtonComponent, Modal, TextComponent } from 'obsidian';
-import DateParser from '../DateParser';
+import { App, ButtonComponent, Modal, Notice, TextComponent } from 'obsidian';
+import DateParser, { FilePeriod, rollingPeriod } from '../DateParser';
 import DailyActivityPlugin from '../main';
 import moment from 'moment';
 
 export default class FilterModal extends Modal {
-    private onSubmit: (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => void;
+    private onSubmit: (periods: FilePeriod[], includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => void;
     private plugin: DailyActivityPlugin;
 
-    constructor(app: App, plugin: DailyActivityPlugin, onSubmit: (fromDate: string, toDate: string, includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => void) {
+    constructor(app: App, plugin: DailyActivityPlugin, onSubmit: (periods: FilePeriod[], includeRegex: string[], excludeRegex: string[], includePaths: string[], excludePaths: string[]) => void) {
         super(app);
         this.onSubmit = onSubmit;
         this.plugin = plugin;
@@ -19,11 +19,14 @@ export default class FilterModal extends Modal {
 
         // Date range
         contentEl.createEl('h3', { text: 'Date Range' });
-        contentEl.createEl('p', { text: 'Leave empty to use today\'s date' });
+        contentEl.createEl('p', {
+            text: 'Leave both fields empty for today. For a rolling period, use digits for the number of hours or days. '
+                + 'Enter a phrase like “last 12 hours” or “past 3 days” in the first field and leave the second empty.'
+        });
 
         const dateContainer = contentEl.createDiv();
         const inputFromDateField = new TextComponent(dateContainer)
-            .setPlaceholder('From date (YYYY-MM-DD)');
+            .setPlaceholder('From date or period');
         dateContainer.createEl('br');
         const inputToDateField = new TextComponent(dateContainer)
             .setPlaceholder('To date (YYYY-MM-DD)');
@@ -64,8 +67,20 @@ export default class FilterModal extends Modal {
                 const fromDateStr = inputFromDateField.getValue().trim();
                 const toDateStr = inputToDateField.getValue().trim();
 
-                let fromDate = fromDateStr ? dateParser.parseDate(fromDateStr).start.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
-                let toDate = toDateStr ? dateParser.parseDate(toDateStr).end.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+                const rolling = rollingPeriod(fromDateStr);
+                let periods: FilePeriod[];
+                if (rolling) {
+                    if (toDateStr) {
+                        new Notice('Leave the end date empty for a rolling period.');
+                        return;
+                    }
+                    periods = [rolling];
+                } else {
+                    const today = moment().format('YYYY-MM-DD');
+                    const from = fromDateStr ? dateParser.parseDate(fromDateStr).start.format('YYYY-MM-DD') : today;
+                    const to = toDateStr ? dateParser.parseDate(toDateStr).end.format('YYYY-MM-DD') : today;
+                    periods = dateParser.parseDateRangeFromSelection(`${from} to ${to}`);
+                }
 
                 // Parse filters
                 const includeRegex = includeRegexField.getValue().split('\n').map(s => s.trim()).filter(s => s.length > 0);
@@ -73,7 +88,7 @@ export default class FilterModal extends Modal {
                 const includePaths = includePathsField.getValue().split('\n').map(s => s.trim()).filter(s => s.length > 0);
                 const excludePaths = excludePathsField.getValue().split('\n').map(s => s.trim()).filter(s => s.length > 0);
 
-                this.onSubmit(fromDate, toDate, includeRegex, excludeRegex, includePaths, excludePaths);
+                this.onSubmit(periods, includeRegex, excludeRegex, includePaths, excludePaths);
                 this.close();
             });
     }
