@@ -1,5 +1,6 @@
 import DailyActivityPlugin from 'src/main';
 import { App, getLinkpath, MarkdownView, Plugin } from 'obsidian';
+import type { DateRange, FilePeriod } from './DateParser';
 import { Moment } from 'moment';
 import { HeaderFormatter } from './settings/HeaderFormatter';
 
@@ -12,18 +13,19 @@ export class ActivityLogger {
         this.plugin = plugin;
     }
 
-    private getLinks(moment: Moment, makeLink: boolean, includeRegex: string[] = [], excludeRegex: string[] = [], includePaths: string[] = [], excludePaths: string[] = [], statType: 'mtime' | 'ctime'): string[] {
-        console.log(`Getting links for moment: ${moment.format()}, makeLink: ${makeLink}, statType: ${statType}`);
+    private getLinks(period: FilePeriod, makeLink: boolean, includeRegex: string[] = [], excludeRegex: string[] = [], includePaths: string[] = [], excludePaths: string[] = [], statType: 'mtime' | 'ctime'): string[] {
+        const start = 'start' in period ? period.start.valueOf() : period.clone().startOf('day').valueOf();
+        const end = 'end' in period ? period.end.valueOf() : period.clone().endOf('day').valueOf();
         return this.app.vault.getFiles()
-            .filter(f => moment.isSame(new Date(f.stat[statType]), 'day') && this.fileMatchesFilters(f.path, includeRegex, excludeRegex, includePaths, excludePaths))
+            .filter(f => f.stat[statType] >= start && f.stat[statType] <= end && this.fileMatchesFilters(f.path, includeRegex, excludeRegex, includePaths, excludePaths))
             .map(f => makeLink ? `[[${getLinkpath(f.path)}]]` : getLinkpath(f.path));
     }
 
-    private getLinksToFilesModifiedOnDate(moment: Moment, makeLink = true, includeRegex: string[] = [], excludeRegex: string[] = [], includePaths: string[] = [], excludePaths: string[] = []): string[] {
+    private getLinksToFilesModifiedOnDate(moment: FilePeriod, makeLink = true, includeRegex: string[] = [], excludeRegex: string[] = [], includePaths: string[] = [], excludePaths: string[] = []): string[] {
         return this.getLinks(moment, makeLink, includeRegex, excludeRegex, includePaths, excludePaths, 'mtime');
     }
 
-    private getLinksToFilesCreatedOnDate(moment: Moment, makeLink = true, includeRegex: string[] = [], excludeRegex: string[] = [], includePaths: string[] = [], excludePaths: string[] = []): string[] {
+    private getLinksToFilesCreatedOnDate(moment: FilePeriod, makeLink = true, includeRegex: string[] = [], excludeRegex: string[] = [], includePaths: string[] = [], excludePaths: string[] = []): string[] {
         return this.getLinks(moment, makeLink, includeRegex, excludeRegex, includePaths, excludePaths, 'ctime');
     }
 
@@ -40,7 +42,7 @@ export class ActivityLogger {
         return matches;
     }
 
-    appendLinksToContent(existingContent: string, links: string[], header: string, cursorOffset?: number): string {
+    appendLinksToContent(existingContent: string, links: string[], header: string, cursorOffset?: number, range?: DateRange): string {
         if (links.length === 0) {
             return existingContent;
         }
@@ -50,8 +52,7 @@ export class ActivityLogger {
 
         let headerText = '';
         if (settings.includeHeader) {
-            const currentMoment = window.moment();
-            headerText = HeaderFormatter.formatHeader(settings.headerStyle, header, currentMoment) + '\n\n';
+            headerText = HeaderFormatter.formatHeader(settings.headerStyle, header, range ?? window.moment()) + '\n\n';
         }
 
         if (settings.insertLocation === 'cursor' && cursorOffset !== undefined) {
@@ -89,7 +90,7 @@ export class ActivityLogger {
     }: {
         insertCreatedOnDateFiles?: boolean,
         insertModifiedOnDateFiles?: boolean,
-        moments?: Moment[],
+        moments?: FilePeriod[],
         activeView?: MarkdownView,
         makeLink?: boolean | null,
         includeRegex?: string[],
@@ -121,12 +122,14 @@ export class ActivityLogger {
             return true;
         };
 
+        const firstPeriod = moments[0];
+        const range = moments.length === 1 && 'start' in firstPeriod ? firstPeriod : undefined;
         if (insertCreatedOnDateFiles) {
             createdTodayLinks = moments.flatMap(moment =>
                 this.getLinksToFilesCreatedOnDate(moment, shouldMakeLink, includeRegex, excludeRegex, includePaths, excludePaths)
                     .filter(excludeCurrentNoteFilter)
             );
-            content = this.appendLinksToContent(content, createdTodayLinks, 'Created', cursorOffset);
+            content = this.appendLinksToContent(content, createdTodayLinks, 'Created', cursorOffset, range);
         }
 
         if (insertModifiedOnDateFiles) {
@@ -137,7 +140,7 @@ export class ActivityLogger {
             );
             // If we've already inserted created links, we need to append to the end
             const adjustedCursorOffset = insertCreatedOnDateFiles ? undefined : cursorOffset;
-            content = this.appendLinksToContent(content, modifiedTodayLinks, 'Modified', adjustedCursorOffset);
+            content = this.appendLinksToContent(content, modifiedTodayLinks, 'Modified', adjustedCursorOffset, range);
         }
 
         await this.app.vault.modify(activeView.file, content);

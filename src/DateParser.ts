@@ -9,6 +9,17 @@ export interface DateRange {
     end: moment.Moment;
 }
 
+export type FilePeriod = Moment | DateRange;
+
+export function rollingPeriod(input: string): DateRange | undefined {
+    const match = /^(?:last|past)\s+([1-9]\d*)\s+(hours?|days?)$/i.exec(input.trim());
+    if (!match) return;
+    const hours = Number(match[1]) * (/^day/i.test(match[2]) ? 24 : 1);
+    const end = moment();
+    const start = end.clone().subtract(hours, 'hours');
+    return start.isValid() ? { start, end } : undefined;
+}
+
 export default class DateParser {
     private plugin: DailyActivityPlugin;
 
